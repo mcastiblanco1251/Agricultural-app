@@ -3,7 +3,7 @@ from multiapp import MultiApp
 from apps import proarroz, parroz#, model # import your app modules here
 from PIL import Image
 
-im = Image.open("C:/Users/Mcastiblanco/Documents/AGPC/DataScience2020/Streamlit/Arroz/apps/rice.gif")
+im = Image.open("rice.gif")
 st.set_page_config(page_title='ML-DL-Arroz-App', layout="wide", page_icon=im)
 apps = MultiApp()
 
