@@ -28,7 +28,7 @@ def app():
     row1_1, row1_2 = st.columns((2, 3))
 
     with row1_1:
-        image = Image.open('C:/Users/Mcastiblanco/Documents/AGPC/DataScience2020/Streamlit/Arroz/apps/ya.jpeg')
+        image = Image.open('ya.jpeg')
         st.image(image, use_column_width=True)
         # st.markdown('Web App by [Manuel Castiblanco](https://github.com/mcastiblanco1251)')
     with row1_2:
