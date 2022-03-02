@@ -97,7 +97,7 @@ def app():
             st.sidebar.write('Condiciones Climáticas')
             r = st.sidebar.slider('Radiación MJ/m²/d', float(ac['Radiación'].min()), float(ac['Radiación'].max()),
                                   float(ac['Radiación'].mean()))
-            t = st.sidebar.slider('Temperatura °C', ac.Temperatura.min(), ac.Temperatura.max(), ac.Temperatura.mean())
+            t = st.sidebar.slider('Temperatura °C', float(ac.Temperatura.min()), float(ac.Temperatura.max()), float(ac.Temperatura.mean()))
             pr = st.sidebar.slider('Precipitación-mm/año', float(ac['Precipitación'].min()),
                                    float(ac['Precipitación'].max()), float(ac['Precipitación'].mean()))
             st.sidebar.write('Tipo Semilla')
