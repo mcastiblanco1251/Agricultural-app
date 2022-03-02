@@ -88,7 +88,7 @@ def app():
     else:
         def user_input_features():
 
-            df = pd.read_csv('C:/Users/Mcastiblanco/Documents/AGPC/DataScience2020/Streamlit/Arroz/apps/Consolidado_Arroz_FY.csv')
+            df = pd.read_csv('/apps/Consolidado_Arroz_FY.csv')
             ac = pd.get_dummies(df, columns=['Semilla Variedades', 'Suelo'])
             st.sidebar.write('Fertilización')
             n = st.sidebar.slider('Nitrogeno Kg/Ha', float(ac.N.min()), float(ac.N.max()), float(ac.N.mean()))
