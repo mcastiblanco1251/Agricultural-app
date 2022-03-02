@@ -169,7 +169,7 @@ def app():
     st.subheader('Configuración de Datos de Entrada')
     input_df
 
-    load_model = pickle.load(open('C:/Users/Mcastiblanco/Documents/AGPC/DataScience2020/Streamlit/Arroz/apps/linear_model.sav', 'rb'))
+    load_model = pickle.load(open('./apps/linear_model.sav', 'rb'))
     prediction = load_model.predict(input_df)
 
     np.random.seed(42)
@@ -209,7 +209,7 @@ def app():
     ))
     row2_1, row2_2 = st.columns((1, 2))
     with row2_1:
-        file_ = open('C:/Users/Mcastiblanco/Documents/AGPC/DataScience2020/Streamlit/Arroz/apps/ha.gif', "rb")
+        file_ = open('./Arroz/apps/ha.gif', "rb")
         contents = file_.read()
         data_url = base64.b64encode(contents).decode("utf-8")
         file_.close()
