@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 import sklearn
 from sklearn import preprocessing
-from sklearn.linear_model import base
+from sklearn.linear_model._base import _base
 #from sklearn.preprocessing import MinMaxScaler
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, LSTM, Dropout
