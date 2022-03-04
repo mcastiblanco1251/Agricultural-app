@@ -6,6 +6,7 @@ import pandas as pd
 import sklearn
 from sklearn import preprocessing
 from sklearn.linear_model import LinearRegression
+from sklearn.model_selection import train_test_split
 #from sklearn.linear_model._base import _base
 #from sklearn.preprocessing import MinMaxScaler
 from tensorflow.keras.models import Sequential
@@ -171,9 +172,15 @@ def app():
     st.subheader('Configuración de Datos de Entrada')
     input_df
 
-    load_model = pickle.load(open('./apps/linear_model.sav', 'rb'))
-
-
+    #load_model = pickle.load(open('./apps/linear_model.sav', 'rb'))
+    df = pd.read_csv("./apps/Consolidado_Arroz_FY.csv")
+    df1=pd.get_dummies(df,columns=['Semilla Variedades','Suelo'])
+    X=df1.drop('Ren (Tn/Ha)',axis=1)
+    X=X.drop('Ciclo',axis=1)
+    y = df1[['Ren (Tn/Ha)']]
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25, random_state=1)
+    regression_model = LinearRegression()
+    load_model=regression_model.fit(X_train, y_train)
     prediction = load_model.predict(input_df)
 
     np.random.seed(42)
@@ -213,7 +220,7 @@ def app():
     ))
     row2_1, row2_2 = st.columns((1, 2))
     with row2_1:
-        file_ = open('./Arroz/apps/ha.gif', "rb")
+        file_ = open('./apps/ha.gif', "rb")
         contents = file_.read()
         data_url = base64.b64encode(contents).decode("utf-8")
         file_.close()
