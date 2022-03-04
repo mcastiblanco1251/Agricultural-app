@@ -220,7 +220,7 @@ def app():
     ))
     row2_1, row2_2 = st.columns((1, 2))
     with row2_1:
-        file_ = open('./apps/ha.gif', "rb")
+        file_ = open('./apps/Ha.gif', "rb")
         contents = file_.read()
         data_url = base64.b64encode(contents).decode("utf-8")
         file_.close()
