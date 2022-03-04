@@ -53,7 +53,7 @@ def app():
 
     def actual_p():
     # Extrae precio
-        browser=webdriver.Chrome('C:/Users/Mcastiblanco/Documents/AGPC/DataScience2020/Chromedriver/chromedriver')
+        browser=webdriver.Chrome('./apps/Chromedriver/chromedriver')
         url='https://fedearroz.com.co/es/fondo-nacional-del-arroz/investigaciones-economicas/estadisticas-arroceras/precios-del-sector-arrocero/'
         browser.get(url)
         time.sleep(2)
@@ -80,7 +80,7 @@ def app():
         p=b1[len(b1)-1]
 
         #Extrae fecha
-        df = pd.read_csv("C:/Users/Mcastiblanco/Documents/AGPC/DataScience2020/Streamlit/Arroz/apps/p_a_paddy.csv")
+        df = pd.read_csv("./apps/p_a_paddy.csv")
         try:
             df["Fecha"]= pd.to_datetime(df["Fecha"], format="%d/%m/%Y")
             df["Fecha"]= pd.to_datetime(df["Fecha"], format="%Y-%m-%d")
@@ -94,13 +94,13 @@ def app():
             pass
         else:
             df2 = pd.DataFrame(ad)
-            df2.to_csv("C:/Users/Mcastiblanco/Documents/AGPC/DataScience2020/Streamlit/Arroz/apps/p_a_paddy.csv", index=False, mode='a', header=False)
+            df2.to_csv("./apps/p_a_paddy.csv", index=False, mode='a', header=False)
         return
 
 
     row1_1, row1_2 = st.columns((2,3))
     with row1_1:
-        image = Image.open('C:/Users/Mcastiblanco/Documents/AGPC/DataScience2020/Streamlit/Arroz/apps/price.jpg')
+        image = Image.open('./apps/price.jpg')
         st.image(image, use_column_width=True)
         #st.markdown('Web App by [Manuel Castiblanco](https://github.com/mcastiblanco1251)')
     with row1_2:
@@ -158,7 +158,7 @@ def app():
     else:
         def user_input_features():
             type=st.sidebar.selectbox('Clase de Arroz', ('Paddy Verde', 'Arroz Blanco', 'Paddy Seco USA' ))
-            df = pd.read_csv("C:/Users/Mcastiblanco/Documents/AGPC/DataScience2020/Streamlit/Arroz/apps/p_a_paddy.csv")
+            df = pd.read_csv("./apps/p_a_paddy.csv")
             #try:
             #df["Fecha"]= pd.to_datetime(df["Fecha"], format="%d/%m/%Y")
             #df["Fecha"]= pd.to_datetime(df["Fecha"], format="%Y-%m-%d")
