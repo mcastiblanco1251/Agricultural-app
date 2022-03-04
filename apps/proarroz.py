@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 import sklearn
 from sklearn import preprocessing
-from sklearn.linear_model._base import _preprocess_data
+from sklearn.linear_model._base import _base
 #from sklearn.preprocessing import MinMaxScaler
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, LSTM, Dropout
@@ -171,6 +171,8 @@ def app():
     input_df
 
     load_model = pickle.load(open('./apps/linear_model.sav', 'rb'))
+
+
     prediction = load_model.predict(input_df)
 
     np.random.seed(42)
