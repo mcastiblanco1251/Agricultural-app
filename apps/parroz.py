@@ -388,4 +388,4 @@ def app():
 
     with st.expander('Ayuda? 👉'):
         st.markdown(
-                " Necesitas Ayuda? contacte a [Manuel Castiblanco](https://ia.smartecorganic.com.co/)")
+                " Necesitas Ayuda? contacte a [Manuel Castiblanco](https://ia.smartecorganic.com.co/index.php/contact/)")

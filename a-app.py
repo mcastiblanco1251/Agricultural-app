@@ -3,7 +3,7 @@ from multiapp import MultiApp
 from apps import proarroz, parroz#, model # import your app modules here
 from PIL import Image
 
-im = Image.open("rice.gif")
+im = Image.open("./apps/rice.gif")
 st.set_page_config(page_title='ML-DL-Arroz-App', layout="wide", page_icon=im)
 apps = MultiApp()
 
@@ -22,7 +22,7 @@ row1_1, row1_2 = st.columns((2, 3))
 with row1_1:
     # image = Image.open('C:/Users/Mcastiblanco/Documents/AGPC/DataScience2020/Streamlit/Arroz/apps/ya.jpeg')
     # st.image(image, use_column_width=True)
-    st.markdown('Web App by [Manuel Castiblanco](https://ia.smartecorganic.com.co)')
+    st.markdown('Web App by [Manuel Castiblanco](https://ia.smartecorganic.com.co/index.php/contact/)')
 with row1_2:
     # st.write("""
     # # Producción de Arroz App
