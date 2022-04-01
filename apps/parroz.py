@@ -53,7 +53,7 @@ def app():
 
     def actual_p():
     # Extrae precio
-        browser=webdriver.Chrome('./apps/Chromedriver/chromedriver')
+        browser=webdriver.Chrome('./apps/chromedriver')#C:/Users/Mcastiblanco/Documents/AGPC/DataScience2020/Streamlit/Arroz
         url='https://fedearroz.com.co/es/fondo-nacional-del-arroz/investigaciones-economicas/estadisticas-arroceras/precios-del-sector-arrocero/'
         browser.get(url)
         time.sleep(2)
@@ -95,7 +95,7 @@ def app():
         else:
             df2 = pd.DataFrame(ad)
             df2.to_csv("./apps/p_a_paddy.csv", index=False, mode='a', header=False)
-        return
+        return df2
 
 
     row1_1, row1_2 = st.columns((2,3))
@@ -156,6 +156,14 @@ def app():
     if uploaded_file !=0:
         df = pd.read_csv(uploaded_file)
     else:
+        def actual_pc(df):
+            today= time.strftime("%Y-%m-%d")
+            x=fecha(today)
+            n=df['Fecha'][len(df)-1]
+            if x==n:
+                pass
+            else:
+                actual_p()
         def user_input_features():
             type=st.sidebar.selectbox('Clase de Arroz', ('Paddy Verde', 'Arroz Blanco', 'Paddy Seco USA' ))
             df = pd.read_csv("./apps/p_a_paddy.csv")
@@ -167,19 +175,13 @@ def app():
             return df
 
         df=user_input_features()
+        actual_pc(df)
+        df = pd.read_csv("./apps/p_a_paddy.csv")
+        #df=user_input_features()
         df['$/Tonelada']=df["$/Tonelada"].astype(float)
         today= time.strftime("%Y-%m-%d")
         date_day = pd.date_range(start='1996-01-01', end=today, freq='M')
         df=df.set_index(date_day)
-        def actual_pc(df):
-            today= time.strftime("%Y-%m-%d")
-            x=fecha(today)
-            n=df['Fecha'][len(df)-1]
-            if x==n:
-                pass
-            else:
-                actual_p()
-        actual_pc(df)
         #df=df.set_index('Fecha')
         #year=df['Fecha'][len(df)-1][5:9]
         #st.subheader(f'Mes a Pronosticar del')# {year}')
