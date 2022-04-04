@@ -53,7 +53,7 @@ def app():
 
     def actual_p():
     # Extrae precio
-        browser=webdriver.Chrome('./apps/chromedriver.exe')#C:/Users/Mcastiblanco/Documents/AGPC/DataScience2020/Streamlit/Arroz
+        browser=webdriver.Chrome('./apps/chromedriver')#C:/Users/Mcastiblanco/Documents/AGPC/DataScience2020/Streamlit/Arroz
         url='https://fedearroz.com.co/es/fondo-nacional-del-arroz/investigaciones-economicas/estadisticas-arroceras/precios-del-sector-arrocero/'
         browser.get(url)
         time.sleep(2)
