@@ -214,7 +214,7 @@ def app():
                 radius=500,
                 elevation_scale=5,
                 elevation_range=[0, 1000],
-                #extruded=True,
+                extruded=True,
             ),
         ],
     ))
