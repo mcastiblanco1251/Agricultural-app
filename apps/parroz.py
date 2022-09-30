@@ -53,7 +53,7 @@ def app():
 
     def actual_p():
     # Extrae precio
-        browser=webdriver.Chrome('./apps/chromedriver')#C:/Users/Mcastiblanco/Documents/AGPC/DataScience2020/Streamlit/Arroz
+        browser=webdriver.Chrome('C:/Users/Mcastiblanco/Documents/AGPC/DataScience2020/Streamlit/Arroz/apps/chromedriver')#C:/Users/Mcastiblanco/Documents/AGPC/DataScience2020/Streamlit/Arroz
         url='https://fedearroz.com.co/es/fondo-nacional-del-arroz/investigaciones-economicas/estadisticas-arroceras/precios-del-sector-arrocero/'
         browser.get(url)
         time.sleep(2)
@@ -171,8 +171,8 @@ def app():
             #df["Fecha"]= pd.to_datetime(df["Fecha"], format="%d/%m/%Y")
             #df["Fecha"]= pd.to_datetime(df["Fecha"], format="%Y-%m-%d")
             #except:
-            #    pass
             return df
+            #    pass
 
         df=user_input_features()
         actual_pc(df)
@@ -180,7 +180,11 @@ def app():
         #df=user_input_features()
         df['$/Tonelada']=df["$/Tonelada"].astype(float)
         today= time.strftime("%Y-%m-%d")
-        date_day = pd.date_range(start='1996-01-01', end=today, freq='M')
+        if today[8:10]=='30' or today[8:10]=='31':
+            today=f'{today[0:8]}29'
+            date_day = pd.date_range(start='1996-01-01', end=today, freq='M')
+        else:
+            date_day = pd.date_range(start='1996-01-01', end=today, freq='M')
         df=df.set_index(date_day)
         #df=df.set_index('Fecha')
         #year=df['Fecha'][len(df)-1][5:9]
