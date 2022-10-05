@@ -387,7 +387,7 @@ def app():
     string = ' '.join(str(x) for x in pred_price)
 
     today = time.strftime("%Y-%m-%d")
-    st.subheader(f'Precio Futuro para {today[0:7]} ${string}COP') #{df['Fecha'][len(df)-1]}
+    st.subheader(f'Precio Futuro para {today[0:7]} ${string[1:10]}COP') #{df['Fecha'][len(df)-1]}
     #st.sidebar.text_input('Future Price:', str(pred_price))
 
     #Contact Form
