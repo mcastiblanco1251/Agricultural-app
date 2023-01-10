@@ -8,3 +8,4 @@ tensorflow==2.10
 selenium
 bs4
 prophet
+plotly.graph_objects
