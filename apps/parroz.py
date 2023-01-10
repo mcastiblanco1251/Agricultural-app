@@ -15,6 +15,11 @@ import requests
 from bs4 import BeautifulSoup
 from datetime import datetime
 import time
+from streamlit_option_menu import option_menu
+from prophet import Prophet
+from prophet.plot import plot_plotly, plot_components_plotly
+import plotly.graph_objects as go
+from sklearn.metrics import mean_squared_error, r2_score, mean_absolute_error
 
 def app():
     #im = Image.open("C:/Users/Mcastiblanco/Documents/AGPC/DataScience2020/Streamlit/Arroz/apps/rice.gif")
@@ -165,7 +170,7 @@ def app():
             else:
                 actual_p()
         def user_input_features():
-            type=st.sidebar.selectbox('Clase de Arroz', ('Paddy Verde', 'Arroz Blanco', 'Paddy Seco USA' ))
+            #type=st.sidebar.selectbox('Clase de Arroz', ('Paddy Verde', 'Arroz Blanco', 'Paddy Seco USA' ))
             df = pd.read_csv("./apps/p_a_paddy.csv")
             #try:
             #df["Fecha"]= pd.to_datetime(df["Fecha"], format="%d/%m/%Y")
@@ -174,224 +179,322 @@ def app():
             return df
             #    pass
 
-        df=user_input_features()
-        actual_pc(df)
-        df = pd.read_csv("./apps/p_a_paddy.csv")
-        #df=user_input_features()
-        df['$/Tonelada']=df["$/Tonelada"].astype(float)
-        today= time.strftime("%Y-%m-%d")
-        if today[8:10]=='30' or today[8:10]=='31':
-            today=f'{today[0:8]}29'
-            date_day = pd.date_range(start='1996-01-01', end=today, freq='M')
-        else:
-            date_day = pd.date_range(start='1996-01-01', end=today, freq='M')
-        df=df.set_index(date_day)
-        #df=df.set_index('Fecha')
-        #year=df['Fecha'][len(df)-1][5:9]
-        #st.subheader(f'Mes a Pronosticar del')# {year}')
+        # --- NAVIGATION MENU ---
+        type=st.sidebar.selectbox('Clase de Arroz', ('Paddy Verde', 'Arroz Blanco', 'Paddy Seco USA' ))
+        selected = option_menu(menu_title=f'Pronóstico de Precios {type}',
+        options=["Pronóstico Períodos", "Pronóstico Mensual"],
+        icons=["graph-up", "bar-chart-fill"],  # https://icons.getbootstrap.com/
+        orientation="horizontal",
+        )
+        if selected == "Pronóstico Períodos":
+            df=user_input_features()
+            #actual_pc(df)
+            df = pd.read_csv("./apps/p_a_paddy.csv")
+            #df=user_input_features()
+            df['$/Tonelada']=df["$/Tonelada"].astype(float)
+            today= time.strftime("%Y-%m-%d")
+            if today[8:10]=='30' or today[8:10]=='31':
+                today=f'{today[0:8]}29'
+                date_day = pd.date_range(start='1996-01-01', end=today, freq='M')
+            else:
+                date_day = pd.date_range(start='1996-01-01', end=today, freq='M')
+            df=df.set_index(date_day)
 
 
-    row2_1, row2_2, = st.columns((2,2))
+            #row1_1, row1_2 = st.columns((3,1))
 
-    with row2_1:
-        st.subheader('Precio arroz 1996-Actual')
-        plt.figure(figsize=(16,15))
-        plt.title('Precio Arroz Paddy Mensual')
-        plt.plot(df['$/Tonelada'])
-        plt.xlabel('Mes',fontsize=18)
-        plt.ylabel('Precio $COP/Ton',fontsize=18)
-        plt.show()
-        st.pyplot(plt.show())
+            #with row1_1:
+            st.subheader('Gráfica Precio arroz 1996-Actual')
+            # Plot raw data
+            #def plot_raw_data():
+            fig = go.Figure()
+            fig.add_trace(go.Scatter(x=df.index, y=df['$/Tonelada'], name="stock_open"))
+            #fig.add_trace(go.Scatter(x=data['Date'], y=data['Close'], name="stock_close"))
+            fig.update_layout( yaxis_title='$Millones COP/Ton',xaxis_title='Mes', #title_text='Precios de Tonelada de Arroz Paddy con Autoajuste'
+                xaxis_rangeslider_visible=True, height=400, width=900)
+            #fig.update_layout_xaxes(title_text = "Month")
 
-    with row2_2:
-        st.subheader('Tabla de Precios')
-        st.write(df['$/Tonelada'].tail(10))
+            st.plotly_chart(fig)
 
-    data = df.filter(["$/Tonelada"])
-    #data
+            #plot_raw_data()
 
-    #Converting the dataframe to a numpy array
-    dataset = data.values
-    #dataset
+            #with row1_2:
+                #st.subheader('Precio arroz Ultimo Año')
+                #st.write(df.tail(12))
+            # Predict forecast with Prophet.
+            st.subheader('Meses a Pronosticar')
+            n_months = st.slider('Número de Meses:',2, 12, 6)
+            period = n_months #* 365
+            df['Fecha']=df.index
+            df_train = df[['Fecha','$/Tonelada']]
+            df_train = df_train.rename(columns={"Fecha": "ds", "$/Tonelada": "y"})
 
-    #Get /Compute the number of rows to train the model on
-    training_data_len = math.ceil( len(dataset) *.8)
-    #training_data_len
-
-    #Scale the all of the data to be values between 0 and 1
-    scaler = MinMaxScaler(feature_range=(0, 1))
-    #scaler
-
-    scaled_data = scaler.fit_transform(dataset)
-    #scaled_data
-
-    #Create the scaled training data set
-    train_data = scaled_data[0:training_data_len, : ]
-    #train_data.shape
-
-    #Split the data into x_train and y_train data sets
-    x_train=[]
-    y_train = []
-    for i in range(60,len(train_data)):
-        x_train.append(train_data[i-60:i,0])
-        y_train.append(train_data[i,0])
-
-    #Scale the all of the data to be values between 0 and 1
-    scaler = MinMaxScaler(feature_range=(0, 1))
-    #scaler
-
-    #Convert x_train and y_train to numpy arrays
-    x_train, y_train = np.array(x_train), np.array(y_train)
-    #x_train.shape, y_train.shape
-
-    #Reshape the data into the shape accepted by the LSTM
-    x_train = np.reshape(x_train, (x_train.shape[0],x_train.shape[1],1))
-    #st.write(x_train)
-
-    #Build the LSTM network model
-    model = Sequential()
-    #
-    model.add(LSTM(units=150, return_sequences=True,input_shape=(x_train.shape[1],1)))
-    #model.add(LSTM(units=25, return_sequences=True))
-    #model.add(LSTM(units=25, return_sequences=True))
-    model.add(LSTM(units=150, return_sequences=False))
-    model.add(Dense(units=150))
-    model.add(Dense(units=1))
+            m = Prophet(changepoint_prior_scale=0.5, seasonality_prior_scale=10,seasonality_mode='multiplicative')#weekly_seasonality=True)
+            m.fit(df_train)
+            future = m.make_future_dataframe(periods=period, freq='M')
+            forecast = m.predict(future)
 
 
-    #Compile the model
+            # Show and plot forecast
+            st.subheader(f'Gráfica de Pronóstico {period} meses')
+            fig1 = plot_plotly(m, forecast)
+            st.plotly_chart(fig1)
+            st.subheader(f'Tabla de Pronóstico de {period} meses')
+            forecast_1=forecast[['ds', 'yhat', 'yhat_lower', 'yhat_upper']].tail(period)
+            forecast_1 = forecast_1.rename(columns={"ds": "Fecha", 'yhat':'Precio', 'yhat_lower':'Precio Inferior', 'yhat_upper':'Precio Superior'})
+            st.table(forecast_1.assign(hack='').set_index('hack'))#[['ds', 'yhat', 'yhat_lower', 'yhat_upper']].tail(period))
 
-    model.compile(optimizer='adam', loss='mae', metrics=['mae'])
+            #st.write(f'Pronóstico para {n_months} meses')
 
-    #st.subheader('Model')
-    #st.write(str(model.summary()))
+            st.subheader("Análisis de Tendencia y Variación Anual")
+            fig2 =plot_components_plotly(m, forecast)
+            st.write(fig2)
 
-    #Train the model
-    model.fit(x_train, y_train, batch_size=8, epochs=50)
+            #st.subheader('Exactitud')
+            metric_df = forecast.set_index('ds')[['yhat']].join(df_train.set_index('ds').y).reset_index()
+            metric_df.dropna(inplace=True)
+            #st.write(metric_df.tail())
+            r_2=r2_score(metric_df.y, metric_df.yhat)
+            mse_1=mean_squared_error(metric_df.y, metric_df.yhat)
+            mae_1=mean_absolute_error(metric_df.y, metric_df.yhat)
+            rmse_1=np.sqrt(mse_1)
 
-    #Test data set
-    test_data = scaled_data[training_data_len - 60: , : ]
-    #test_data
-
-    #Create the x_test and y_test data sets
-    x_test = []
-    y_test =  dataset[training_data_len : , : ] #Get all of the rows from index 1603 to the rest and all of the columns (in this case it's only column 'Close'), so 2003 - 1603 = 400 rows of data
-    for i in range(60,len(test_data)):
-        x_test.append(test_data[i-60:i,0])
-
-    #Convert x_test to a numpy array
-    x_test = np.array(x_test)
-    #x_test
-
-    #Reshape the data into the shape accepted by the LSTM
-    x_test = np.reshape(x_test, (x_test.shape[0],x_test.shape[1],1))
-
-
-    #Getting the models predicted price values
-    predictions = model.predict(x_test)
-    scaler=scaler.fit(dataset)
-    predictions = scaler.inverse_transform(predictions)#Undo scaling
-    #predictions
-
-    #Calculate/Get the value of RMSE
-    rmse=np.sqrt(np.mean(((predictions- y_test)**2)))
-    #rmse
-
-    import sklearn
-    from sklearn.metrics import r2_score
-    r2=sklearn.metrics.r2_score(predictions, y_test)
-
-    from sklearn.metrics import mean_absolute_error
-    mae=mean_absolute_error(predictions, y_test)
-
-    from sklearn.metrics import mean_squared_error
-    mse=mean_squared_error(predictions, y_test)
+            st.subheader('Evaluación de Exactitud del Modelo')
+            #acc={'RMSE': rmse, 'R2':r2, 'MSE':mse, 'MAE':mae}
+            st.write(pd.DataFrame({'RMSE': rmse_1, 'R2':r_2, 'MSE':mse_1,'MAE':mae_1}, columns=['RMSE', 'R2', 'MSE', 'MAE'], index=['Acurracy']))
 
 
-    # latest_iteration = st.empty()
-    # bar = st.progress(0)
-    # iter=50
-    # for i in range(iter):
-    #     latest_iteration.text(f'Progress {i*(150//iter)}%')
-    #     bar.progress(i *(150//iter))
-    #     time.sleep(0.1)
+            if r_2>=0.90:
+                st.write('**Gran Desempeño!!!**')
+            elif r_2>=0.8 and r_2<0.9:
+                st.write('**Aceptable Desempeño**')
+            elif r_2>0.6 and r_2<0.8:
+                st.write('**Regular Desempeño**')
+            elif r_2<0.6:
+                st.write('**Bajo Desempeño- Rechazar Modelo**')
 
 
-    st.subheader('Evaluación de Exactitud del Modelo')
-    #acc={'RMSE': rmse, 'R2':r2, 'MSE':mse, 'MAE':mae}
-    st.write(pd.DataFrame({'RMSE': rmse, 'R2':r2, 'MSE':mse,'MAE':mae}, columns=['RMSE', 'R2', 'MSE', 'MAE'], index=['Acurracy']))
+
+        ## PROYECION MENSUAL
+
+        if selected == "Pronóstico Mensual":
+            df=user_input_features()
+            #actual_pc(df)
+            df = pd.read_csv("./apps/p_a_paddy.csv")
+            #df=user_input_features()
+            df['$/Tonelada']=df["$/Tonelada"].astype(float)
+            today= time.strftime("%Y-%m-%d")
+            if today[8:10]=='30' or today[8:10]=='31':
+                today=f'{today[0:8]}29'
+                date_day = pd.date_range(start='1996-01-01', end=today, freq='M')
+            else:
+                date_day = pd.date_range(start='1996-01-01', end=today, freq='M')
+            df=df.set_index(date_day)
+                #df=df.set_index('Fecha')
+                #year=df['Fecha'][len(df)-1][5:9]
+                #st.subheader(f'Mes a Pronosticar del')# {year}')
+
+            row2_1, row2_2, = st.columns((3,2))
+
+            with row2_1:
+                st.subheader('Precio arroz 1996-Actual')
+                plt.figure(figsize=(16,15))
+                plt.title('Precio Arroz Paddy Mensual')
+                plt.plot(df['$/Tonelada'])
+                plt.xlabel('Mes',fontsize=18)
+                plt.ylabel('Precio $COP/Ton',fontsize=18)
+                plt.show()
+                st.pyplot(plt.show())
+
+            with row2_2:
+                st.subheader('Tabla de Precios')
+                st.write(df['$/Tonelada'].tail(10))
+
+                data = df.filter(["$/Tonelada"])
+            #data
+
+            #Converting the dataframe to a numpy array
+            dataset = data.values
+            #dataset
+
+            #Get /Compute the number of rows to train the model on
+            training_data_len = math.ceil( len(dataset) *.8)
+            #training_data_len
+
+            #Scale the all of the data to be values between 0 and 1
+            scaler = MinMaxScaler(feature_range=(0, 1))
+            #scaler
+
+            scaled_data = scaler.fit_transform(dataset)
+            #scaled_data
+
+            #Create the scaled training data set
+            train_data = scaled_data[0:training_data_len, : ]
+            #train_data.shape
+
+            #Split the data into x_train and y_train data sets
+            x_train=[]
+            y_train = []
+            for i in range(60,len(train_data)):
+                x_train.append(train_data[i-60:i,0])
+                y_train.append(train_data[i,0])
+
+            #Scale the all of the data to be values between 0 and 1
+            scaler = MinMaxScaler(feature_range=(0, 1))
+            #scaler
+
+            #Convert x_train and y_train to numpy arrays
+            x_train, y_train = np.array(x_train), np.array(y_train)
+            #x_train.shape, y_train.shape
+
+            #Reshape the data into the shape accepted by the LSTM
+            x_train = np.reshape(x_train, (x_train.shape[0],x_train.shape[1],1))
+            #st.write(x_train)
+
+            #Build the LSTM network model
+            model = Sequential()
+            #
+            model.add(LSTM(units=150, return_sequences=True,input_shape=(x_train.shape[1],1)))
+            #model.add(LSTM(units=25, return_sequences=True))
+            #model.add(LSTM(units=25, return_sequences=True))
+            model.add(LSTM(units=150, return_sequences=False))
+            model.add(Dense(units=150))
+            model.add(Dense(units=1))
 
 
-    if r2>=0.90:
-        st.write('**Gran Desempeño!!!**')
-    elif r2>=0.8 and r2<0.9:
-        st.write('**Aceptable Desempeño**')
-    elif r2>0.6 and r2<0.8:
-        st.write('**Regular Desempeño**')
-    elif r2<0.6:
-        st.write('**Bajo Desempeño- Rechazar Modelo**')
+            #Compile the model
 
-    # training metrics
-    #scores = model.evaluate(x_train, y_train, verbose=1, batch_size=200)
-    #print('Accurracy: {}'.format(scores[1]))
+            model.compile(optimizer='adam', loss='mae', metrics=['mae'])
 
-    #Plot/Create the data for the graph
-    train = data[:training_data_len]
-    valid = data[training_data_len:]
-    valid['Predictions'] = predictions
-    #valid
+            #st.subheader('Model')
+            #st.write(str(model.summary()))
 
-    #st.subheader('Company name: ' + name)
-    st.subheader('Predicción')
-    row3_1, row3_2, = st.columns((2,2))
+            #Train the model
+            model.fit(x_train, y_train, batch_size=8, epochs=50)
 
-    with row3_1:
-    #Visualize the data
-        st.subheader('Gráfico Precio Real y Predicción')
-        plt.figure(figsize=(16,15))
-        plt.title('Modelo')
-        plt.xlabel('Fecha', fontsize=18)
-        plt.ylabel('Precio Arroz Paddy $COP/Ton', fontsize=18)
-        plt.plot(train['$/Tonelada'])
-        plt.plot(valid[['$/Tonelada', 'Predictions']])
-        plt.legend(['Train', 'Val', 'Predictions'], loc='lower right')
-        plt.show()
-        #plt.show()
-        st.pyplot(plt.show())
-    #Show the valid and predicted prices
+            #Test data set
+            test_data = scaled_data[training_data_len - 60: , : ]
+            #test_data
 
-    with row3_2:
-        st.subheader('Precios Reales y Predicción')
-        st.write(valid.tail(10))
+            #Create the x_test and y_test data sets
+            x_test = []
+            y_test =  dataset[training_data_len : , : ] #Get all of the rows from index 1603 to the rest and all of the columns (in this case it's only column 'Close'), so 2003 - 1603 = 400 rows of data
+            for i in range(60,len(test_data)):
+                x_test.append(test_data[i-60:i,0])
 
-    #Get the quote
-    stock_quote = df#pdr.get_data_yahoo(stock, start='2012-01-01', end=end)
-    #Create a new dataframe
-    new_df = stock_quote.filter(['$/Tonelada'])
-    #Get teh last 60 day closing price
-    last_60_days = new_df[-60:].values
-    #Scale the data to be values between 0 and 1
-    last_60_days_scaled = scaler.transform(last_60_days)
-    #Create an empty list
-    X_test = []
-    #Append teh past 60 days
-    X_test.append(last_60_days_scaled)
-    #Convert the X_test data set to a numpy array
-    X_test = np.array(X_test)
-    #Reshape the data
-    X_test = np.reshape(X_test, (X_test.shape[0], X_test.shape[1], 1))
-    #Get the predicted scaled price
-    pred_price = model.predict(X_test)
-    #undo the scaling
-    pred_price = scaler.inverse_transform(pred_price)
-    string = ' '.join(str(x) for x in pred_price)
+            #Convert x_test to a numpy array
+            x_test = np.array(x_test)
+            #x_test
 
-    today = time.strftime("%Y-%m-%d")
-    st.subheader(f'Precio Futuro para {today[0:7]} es ${string[1:9]}COP') #{df['Fecha'][len(df)-1]}
-    #st.sidebar.text_input('Future Price:', str(pred_price))
+            #Reshape the data into the shape accepted by the LSTM
+            x_test = np.reshape(x_test, (x_test.shape[0],x_test.shape[1],1))
 
-    #Contact Form
 
-    with st.expander('Ayuda? 👉'):
-        st.markdown(
-                " Necesitas Ayuda? contacte a [Manuel Castiblanco](https://ia.smartecorganic.com.co/index.php/contact/)")
+            #Getting the models predicted price values
+            predictions = model.predict(x_test)
+            scaler=scaler.fit(dataset)
+            predictions = scaler.inverse_transform(predictions)#Undo scaling
+            #predictions
+
+            #Calculate/Get the value of RMSE
+            rmse=np.sqrt(np.mean(((predictions- y_test)**2)))
+            #rmse
+
+            #import sklearn
+            #from sklearn.metrics import r2_score
+            r2=r2_score(predictions, y_test)
+
+            #from sklearn.metrics import mean_absolute_error
+            mae=mean_absolute_error(predictions, y_test)
+
+            #from sklearn.metrics import mean_squared_error
+            mse=mean_squared_error(predictions, y_test)
+
+
+            # latest_iteration = st.empty()
+            # bar = st.progress(0)
+            # iter=50
+            # for i in range(iter):
+            #     latest_iteration.text(f'Progress {i*(150//iter)}%')
+            #     bar.progress(i *(150//iter))
+            #     time.sleep(0.1)
+
+
+            st.subheader('Evaluación de Exactitud del Modelo')
+            #acc={'RMSE': rmse, 'R2':r2, 'MSE':mse, 'MAE':mae}
+            st.write(pd.DataFrame({'RMSE': rmse, 'R2':r2, 'MSE':mse,'MAE':mae}, columns=['RMSE', 'R2', 'MSE', 'MAE'], index=['Acurracy']))
+
+
+            if r2>=0.90:
+                st.write('**Gran Desempeño!!!**')
+            elif r2>=0.8 and r2<0.9:
+                st.write('**Aceptable Desempeño**')
+            elif r2>0.6 and r2<0.8:
+                st.write('**Regular Desempeño**')
+            elif r2<0.6:
+                st.write('**Bajo Desempeño- Rechazar Modelo**')
+
+            # training metrics
+            #scores = model.evaluate(x_train, y_train, verbose=1, batch_size=200)
+            #print('Accurracy: {}'.format(scores[1]))
+
+            #Plot/Create the data for the graph
+            train = data[:training_data_len]
+            valid = data[training_data_len:]
+            valid['Predictions'] = predictions
+            #valid
+
+            #st.subheader('Company name: ' + name)
+            st.subheader('Predicción')
+            row3_1, row3_2, = st.columns((2,2))
+
+            with row3_1:
+            #Visualize the data
+                st.subheader('Gráfico Precio Real y Predicción')
+                plt.figure(figsize=(16,15))
+                plt.title('Modelo')
+                plt.xlabel('Fecha', fontsize=18)
+                plt.ylabel('Precio Arroz Paddy $COP/Ton', fontsize=18)
+                plt.plot(train['$/Tonelada'])
+                plt.plot(valid[['$/Tonelada', 'Predictions']])
+                plt.legend(['Train', 'Val', 'Predictions'], loc='lower right')
+                plt.show()
+                #plt.show()
+                st.pyplot(plt.show())
+            #Show the valid and predicted prices
+
+            with row3_2:
+                st.subheader('Precios Reales y Predicción')
+                st.write(valid.tail(10))
+
+            #Get the quote
+            stock_quote = df#pdr.get_data_yahoo(stock, start='2012-01-01', end=end)
+            #Create a new dataframe
+            new_df = stock_quote.filter(['$/Tonelada'])
+            #Get teh last 60 day closing price
+            last_60_days = new_df[-60:].values
+            #Scale the data to be values between 0 and 1
+            last_60_days_scaled = scaler.transform(last_60_days)
+            #Create an empty list
+            X_test = []
+            #Append teh past 60 days
+            X_test.append(last_60_days_scaled)
+            #Convert the X_test data set to a numpy array
+            X_test = np.array(X_test)
+            #Reshape the data
+            X_test = np.reshape(X_test, (X_test.shape[0], X_test.shape[1], 1))
+            #Get the predicted scaled price
+            pred_price = model.predict(X_test)
+            #undo the scaling
+            pred_price = scaler.inverse_transform(pred_price)
+            string = ' '.join(str(x) for x in pred_price)
+
+            today = time.strftime("%Y-%m-%d")
+            st.subheader(f'Precio Futuro para {today[0:7]} es ${string[1:9]}COP') #{df['Fecha'][len(df)-1]}
+            #st.sidebar.text_input('Future Price:', str(pred_price))
+
+            #Contact Form
+
+            with st.expander('Ayuda? 👉'):
+                st.markdown(
+                        " Necesitas Ayuda? contacte a [Manuel Castiblanco](https://ia.smartecorganic.com.co/index.php/contact/)")
