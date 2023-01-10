@@ -15,7 +15,7 @@ import matplotlib.pyplot as plt
 plt.style.use('fivethirtyeight')
 from datetime import date
 import streamlit as st
-from pandas_datareader import data as pdr
+#from pandas_datareader import data as pdr
 from datetime import date
 from PIL import Image
 import base64
