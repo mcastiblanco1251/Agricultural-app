@@ -218,7 +218,7 @@ def app():
             ),
         ],
     ))
-    row2_1, row2_2 = st.columns((1, 2))
+    row2_1, row2_2 = st.columns((1, 3))
     with row2_1:
         file_ = open('./apps/Ha.gif', "rb")
         contents = file_.read()
@@ -229,4 +229,4 @@ def app():
             unsafe_allow_html=True
         )
     with row2_2:
-        st.subheader(f'Productividad esperada Ton/Ha:{prediction}')
+        st.subheader(f'Productividad esperada Ton/Ha: {str(prediction)[2:6]}')
