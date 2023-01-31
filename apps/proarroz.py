@@ -229,4 +229,4 @@ def app():
             unsafe_allow_html=True
         )
     with row2_2:
-        st.subheader(f'Productividad esperada Ton/Ha: {str(prediction)[2:6]}')
+        st.subheader(f'Productividad esperada: {str(prediction)[2:6]} Ton/Ha')
