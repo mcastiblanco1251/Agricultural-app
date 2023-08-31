@@ -110,12 +110,12 @@ def app():
             su = sorted(list(ac.columns[16:42]))
             su1 = st.sidebar.multiselect('Suelo Variedad', sorted(list(ac.columns[16:42])), sorted(list(ac.columns[16:17])))
             data = {
-                'N'=n,#'Nitrogeno Kg/Ha': n,
-                'P'=p,#'Fósforo Kg/Ha': p,
-                'K'=k,#'Potasio Kg/Ha': k,
-                'Radiación'=r,#'Radiación MJ/m²/d': r,
-                'Temaperatura'=t,#'Temperatura°C': t,
-                'Precipitación'=pr}#'Precipitación-mm/año': pr}
+                'N':n,#'Nitrogeno Kg/Ha': n,
+                'P':p,#'Fósforo Kg/Ha': p,
+                'K':k,#'Potasio Kg/Ha': k,
+                'Radiación':r,#'Radiación MJ/m²/d': r,
+                'Temaperatura':t,#'Temperatura°C': t,
+                'Precipitación':pr}#'Precipitación-mm/año': pr}
 
             # 'Semilla Variedad': se1,
             # 'Suelo Variedad': su}
