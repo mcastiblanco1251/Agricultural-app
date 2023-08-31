@@ -3,8 +3,8 @@ import time
 import pickle
 import numpy as np
 import pandas as pd
-import sklearn
-from sklearn import preprocessing
+#import sklearn
+#from sklearn import preprocessing
 from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import train_test_split
 #from sklearn.linear_model._base import _base
@@ -170,15 +170,19 @@ def app():
 
         input_df = user_input_features()
     st.subheader('Configuración de Datos de Entrada')
-    input_df
+    st.write(input_df)
 
     #load_model = pickle.load(open('./apps/linear_model.sav', 'rb'))
     df = pd.read_csv("./apps/Consolidado_Arroz_FY.csv")
     df1=pd.get_dummies(df,columns=['Semilla Variedades','Suelo'])
     X=df1.drop('Ren (Tn/Ha)',axis=1)
     X=X.drop('Ciclo',axis=1)
+    st.write(X)
     y = df1[['Ren (Tn/Ha)']]
+    st.write(y)
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25, random_state=1)
+    st.write(X_train)
+    st.write(y_train)
     regression_model = LinearRegression()
     load_model=regression_model.fit(X_train, y_train)
     prediction = load_model.predict(input_df)
@@ -218,8 +222,8 @@ def app():
             ),
         ],
     ))
-    row2_1, row2_2 = st.columns((1, 3))
-    with row2_1:
+    row2_1, row2_2 = st.columns((3, 1))
+    with row2_2:
         file_ = open('./apps/Ha.gif', "rb")
         contents = file_.read()
         data_url = base64.b64encode(contents).decode("utf-8")
@@ -228,5 +232,5 @@ def app():
             f'<img src="data:image/gif;base64,{data_url}" alt="rice" width="150" height="100"/>',
             unsafe_allow_html=True
         )
-    with row2_2:
+    with row2_1:
         st.subheader(f'Productividad esperada: {str(prediction)[2:6]} Ton/Ha')
