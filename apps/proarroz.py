@@ -3,8 +3,8 @@ import time
 import pickle
 import numpy as np
 import pandas as pd
-#import sklearn
-#from sklearn import preprocessing
+import sklearn
+from sklearn import preprocessing
 from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import train_test_split
 #from sklearn.linear_model._base import _base
