@@ -115,7 +115,7 @@ def app():
                 'K'=k,#'Potasio Kg/Ha': k,
                 'Radiación'=r,#'Radiación MJ/m²/d': r,
                 'Temaperatura'=t,#'Temperatura°C': t,
-                'Precipitación'=p}r#'Precipitación-mm/año': pr}
+                'Precipitación'=pr}#'Precipitación-mm/año': pr}
 
             # 'Semilla Variedad': se1,
             # 'Suelo Variedad': su}
