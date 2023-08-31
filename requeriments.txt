@@ -4,7 +4,7 @@ pandas
 numpy
 scikit-learn=1.2.2
 matplotlib
-tensorflow==2.10
+tensorflow
 selenium
 bs4
 prophet
