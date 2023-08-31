@@ -1,0 +1,11 @@
+streamlit
+streamlit_option_menu
+pandas
+numpy
+scikit-learn=1.2.2
+matplotlib
+tensorflow==2.10
+selenium
+bs4
+prophet
+plotly
