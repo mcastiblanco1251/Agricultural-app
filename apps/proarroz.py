@@ -170,19 +170,18 @@ def app():
 
         input_df = user_input_features()
     st.subheader('Configuración de Datos de Entrada')
-    st.write(input_df)
+    st.datafream(input_df, hide_index=True)
 
     #load_model = pickle.load(open('./apps/linear_model.sav', 'rb'))
     df = pd.read_csv("./apps/Consolidado_Arroz_FY.csv")
     df1=pd.get_dummies(df,columns=['Semilla Variedades','Suelo'])
     X=df1.drop('Ren (Tn/Ha)',axis=1)
     X=X.drop('Ciclo',axis=1)
-    st.write(X)
+
     y = df1[['Ren (Tn/Ha)']]
-    st.write(y)
+
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25, random_state=1)
-    st.write(X_train)
-    st.write(y_train)
+
     regression_model = LinearRegression()
     load_model=regression_model.fit(X_train, y_train)
     prediction = load_model.predict(input_df)
