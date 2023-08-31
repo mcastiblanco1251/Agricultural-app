@@ -170,7 +170,7 @@ def app():
 
         input_df = user_input_features()
     st.subheader('Configuración de Datos de Entrada')
-    st.datafream(input_df, hide_index=True)
+    st.dataframe(input_df, hide_index=True)
 
     #load_model = pickle.load(open('./apps/linear_model.sav', 'rb'))
     df = pd.read_csv("./apps/Consolidado_Arroz_FY.csv")
