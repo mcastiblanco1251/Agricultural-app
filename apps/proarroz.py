@@ -114,7 +114,7 @@ def app():
                 'P':p,#'Fósforo Kg/Ha': p,
                 'K':k,#'Potasio Kg/Ha': k,
                 'Radiación':r,#'Radiación MJ/m²/d': r,
-                'Temaperatura':t,#'Temperatura°C': t,
+                'Temperatura':t,#'Temperatura°C': t,
                 'Precipitación':pr}#'Precipitación-mm/año': pr}
 
             # 'Semilla Variedad': se1,
