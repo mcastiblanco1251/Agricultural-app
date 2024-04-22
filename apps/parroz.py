@@ -2,8 +2,8 @@ import math
 import numpy as np
 import pandas as pd
 from sklearn.preprocessing import MinMaxScaler
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Dense, LSTM
+#from tensorflow.keras.models import Sequential
+#from tensorflow.keras.layers import Dense, LSTM
 import matplotlib.pyplot as plt
 plt.style.use('fivethirtyeight')
 import streamlit as st
@@ -19,7 +19,7 @@ from streamlit_option_menu import option_menu
 from prophet import Prophet
 from prophet.plot import plot_plotly, plot_components_plotly
 import plotly.graph_objects as go
-from sklearn.metrics import mean_squared_error, r2_score, mean_absolute_error
+from sklearn.metrics import mean_squared_error, r2_score, mean_absolute_error, mean_absolute_percentage_error
 
 def app():
     #im = Image.open("C:/Users/Mcastiblanco/Documents/AGPC/DataScience2020/Streamlit/Arroz/apps/rice.gif")
@@ -161,17 +161,18 @@ def app():
     if uploaded_file !=0:
         df = pd.read_csv(uploaded_file)
     else:
-        def actual_pc(df):
+        def actual_pc():
+            df = pd.read_csv("./apps/p_a_paddy_pf.csv")
             today= time.strftime("%Y-%m-%d")
             x=fecha(today)
             n=df['Fecha'][len(df)-1]
             if x==n:
                 pass
             else:
-                actual_p()
+                pass#actual_p()
         def user_input_features():
             #type=st.sidebar.selectbox('Clase de Arroz', ('Paddy Verde', 'Arroz Blanco', 'Paddy Seco USA' ))
-            df = pd.read_csv("./apps/p_a_paddy.csv")
+            df = pd.read_csv("./apps/p_a_paddy_pf.csv")
             #try:
             #df["Fecha"]= pd.to_datetime(df["Fecha"], format="%d/%m/%Y")
             #df["Fecha"]= pd.to_datetime(df["Fecha"], format="%Y-%m-%d")
@@ -188,23 +189,24 @@ def app():
         )
         if selected == "Pronóstico Períodos":
             df=user_input_features()
-            #actual_pc(df)
-            df = pd.read_csv("./apps/p_a_paddy.csv")
+            actual_pc()
+            df = pd.read_csv("./apps/p_a_paddy_pf.csv")
             #df=user_input_features()
             df['$/Tonelada']=df["$/Tonelada"].astype(float)
+            df['Area Sembrada']=df["Area Sembrada"].astype(int)
             today= time.strftime("%Y-%m-%d")
             if today[8:10]=='30' or today[8:10]=='31':
                 today=f'{today[0:8]}29'
-                date_day = pd.date_range(start='1996-01-01', end=today, freq='M')
+                date_day = pd.date_range(start='2000-01-01', end=today, freq='M')
             else:
-                date_day = pd.date_range(start='1996-01-01', end=today, freq='M')
+                date_day = pd.date_range(start='2000-01-01', end=today, freq='M')
             df=df.set_index(date_day)
 
 
             #row1_1, row1_2 = st.columns((3,1))
 
             #with row1_1:
-            st.subheader('Gráfica Precio arroz 1996-Actual')
+            st.subheader('Gráfica Precio arroz 2000-Actual')
             # Plot raw data
             #def plot_raw_data():
             fig = go.Figure()
@@ -216,6 +218,17 @@ def app():
 
             st.plotly_chart(fig)
 
+            st.subheader('Gráfica Area Sembrada arroz 2000-Actual')
+            # Plot raw data
+            #def plot_raw_data():
+            fig = go.Figure()
+            fig.add_trace(go.Scatter(x=df.index, y=df['Area Sembrada'], name="stock_open"))
+            #fig.add_trace(go.Scatter(x=data['Date'], y=data['Close'], name="stock_close"))
+            fig.update_layout( yaxis_title='Héctareas',xaxis_title='Mes', #title_text='Precios de Tonelada de Arroz Paddy con Autoajuste'
+                xaxis_rangeslider_visible=True, height=400, width=900)
+            #fig.update_layout_xaxes(title_text = "Month")
+
+            st.plotly_chart(fig)
             #plot_raw_data()
 
             #with row1_2:
@@ -223,17 +236,25 @@ def app():
                 #st.write(df.tail(12))
             # Predict forecast with Prophet.
             st.subheader('Meses a Pronosticar')
-            n_months = st.slider('Número de Meses:',2, 12, 6)
+            n_months = st.slider('Número de Meses:',2, 16, 6)
             period = n_months #* 365
             df['Fecha']=df.index
-            df_train = df[['Fecha','$/Tonelada']]
+            df_train = df[['Fecha','$/Tonelada', 'Area Sembrada']]
             df_train = df_train.rename(columns={"Fecha": "ds", "$/Tonelada": "y"})
-
-            m = Prophet(changepoint_prior_scale=0.5, seasonality_prior_scale=10,seasonality_mode='multiplicative')#weekly_seasonality=True)
+            st.write(df_train)
+            cor=df_train.corrwith(df_train["y"])
+            st.write(cor)
+            #m = Prophet(changepoint_prior_scale=0.5, seasonality_prior_scale=10,seasonality_mode='multiplicative')#weekly_seasonality=True)
+            #m.fit(df_train)
+            #future = m.make_future_dataframe(periods=period, freq='M')
+            #forecast = m.predict(future)
+            m = Prophet(changepoint_prior_scale=0.5, seasonality_prior_scale=10,seasonality_mode='multiplicative')
+            m.add_regressor('Area Sembrada', standardize=False)
             m.fit(df_train)
-            future = m.make_future_dataframe(periods=period, freq='M')
-            forecast = m.predict(future)
-
+            future_baseline = m.make_future_dataframe(periods=period, freq='M')
+            future_baseline=pd.merge(future_baseline, df_train[['ds', 'Area Sembrada']], on='ds', how='inner')
+            #future_baseline=future_baseline.fillna(method='ffill')
+            forecast = m.predict(future_baseline)
 
             # Show and plot forecast
             st.subheader(f'Gráfica de Pronóstico {period} meses')
@@ -257,11 +278,12 @@ def app():
             r_2=r2_score(metric_df.y, metric_df.yhat)
             mse_1=mean_squared_error(metric_df.y, metric_df.yhat)
             mae_1=mean_absolute_error(metric_df.y, metric_df.yhat)
+            mape=mean_absolute_percentage_error(metric_df.y, metric_df.yhat)
             rmse_1=np.sqrt(mse_1)
 
             st.subheader('Evaluación de Exactitud del Modelo')
             #acc={'RMSE': rmse, 'R2':r2, 'MSE':mse, 'MAE':mae}
-            st.write(pd.DataFrame({'RMSE': rmse_1, 'R2':r_2, 'MSE':mse_1,'MAE':mae_1}, columns=['RMSE', 'R2', 'MSE', 'MAE'], index=['Acurracy']))
+            st.write(pd.DataFrame({'RMSE': rmse_1, 'R2':r_2, 'MSE':mse_1,'MAE':mae_1, 'MAPE':mape}, columns=['RMSE', 'R2', 'MSE', 'MAE', 'MAPE'], index=['Acurracy']))
 
 
             if r_2>=0.90:

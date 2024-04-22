@@ -9,8 +9,8 @@ from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import train_test_split
 #from sklearn.linear_model._base import _base
 #from sklearn.preprocessing import MinMaxScaler
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Dense, LSTM, Dropout
+#from tensorflow.keras.models import Sequential
+#from tensorflow.keras.layers import Dense, LSTM, Dropout
 import matplotlib.pyplot as plt
 plt.style.use('fivethirtyeight')
 from datetime import date
@@ -170,7 +170,7 @@ def app():
 
         input_df = user_input_features()
     st.subheader('Configuración de Datos de Entrada')
-    st.dataframe(input_df, hide_index=True)
+    st.dataframe(input_df)#, hide_index=True)
 
     #load_model = pickle.load(open('./apps/linear_model.sav', 'rb'))
     df = pd.read_csv("./apps/Consolidado_Arroz_FY.csv")
