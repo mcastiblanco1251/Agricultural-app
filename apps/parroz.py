@@ -162,7 +162,7 @@ def app():
         df = pd.read_csv(uploaded_file)
     else:
         def actual_pc():
-            df = pd.read_csv("./apps/p_a_paddy_pf.csv")
+            df = pd.read_csv("./apps/p_a_paddy.csv")
             today= time.strftime("%Y-%m-%d")
             x=fecha(today)
             n=df['Fecha'][len(df)-1]
@@ -172,7 +172,7 @@ def app():
                 pass#actual_p()
         def user_input_features():
             #type=st.sidebar.selectbox('Clase de Arroz', ('Paddy Verde', 'Arroz Blanco', 'Paddy Seco USA' ))
-            df = pd.read_csv("./apps/p_a_paddy_pf.csv")
+            df = pd.read_csv("./apps/p_a_paddy.csv")
             #try:
             #df["Fecha"]= pd.to_datetime(df["Fecha"], format="%d/%m/%Y")
             #df["Fecha"]= pd.to_datetime(df["Fecha"], format="%Y-%m-%d")
@@ -190,7 +190,7 @@ def app():
         if selected == "Pronóstico Períodos":
             df=user_input_features()
             actual_pc()
-            df = pd.read_csv("./apps/p_a_paddy_pf.csv")
+            df = pd.read_csv("./apps/p_a_paddy.csv")
             #df=user_input_features()
             df['$/Tonelada']=df["$/Tonelada"].astype(float)
             df['Area Sembrada']=df["Area Sembrada"].astype(int)
