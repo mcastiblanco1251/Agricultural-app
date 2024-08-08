@@ -24,7 +24,7 @@ from sklearn.metrics import mean_squared_error, r2_score, mean_absolute_error
 def app():
     #im = Image.open("C:/Users/Mcastiblanco/Documents/AGPC/DataScience2020/Streamlit/Arroz/apps/rice.gif")
     #st.set_page_config(page_title='Precio-Predict-LSTM', layout="wide", page_icon=im)
-    st.set_option('deprecation.showPyplotGlobalUse', False)
+    #st.set_option('deprecation.showPyplotGlobalUse', False)
 
     # Actualización precio
     def fecha(today):
