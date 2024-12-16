@@ -32,7 +32,7 @@ def app():
 
     with row1_1:
         image = Image.open('ya.jpeg')
-        st.image(image, use_column_width=True)
+        st.image(image, use_container_width=True)
         # st.markdown('Web App by [Manuel Castiblanco](https://github.com/mcastiblanco1251)')
     with row1_2:
         st.write("""
@@ -66,7 +66,7 @@ def app():
     st.markdown('____________________________________________________________________')
     app_des = st.expander('Descripción App')
     with app_des:
-        st.write("""Esta aplicación se desarrollo en la región arrocera del Hulia, específicamente en Yaguará,
+        st.write("""Esta aplicación se desarrollo en la región arrocera del Huila, específicamente en Yaguará,
         para lo cual los datos son válidos para el área cercana a este punto. La modelación tiene objetivo predecir la
         productividad Ton por Ha, teniendo en cuenta las siguientes variables:""")
         st.write("""
