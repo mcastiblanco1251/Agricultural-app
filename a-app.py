@@ -5,6 +5,14 @@ from PIL import Image
 
 im = Image.open("./apps/rice.gif")
 st.set_page_config(page_title='ML-DL-Arroz-App', layout="wide", page_icon=im)
+hide_menu_style = """
+        <style>
+        #MainMenu {visibility: hidden;}
+        footer {visibility: hidden;}
+        .checkbox-text {font-size:114px;}
+        </style>
+        """
+st.markdown(hide_menu_style, unsafe_allow_html=True)
 apps = MultiApp()
 
 st.markdown("""
