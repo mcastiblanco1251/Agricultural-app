@@ -60,6 +60,6 @@ class MultiApp:
         # st.write('after', app_state)
         st.sidebar.subheader('Datos de Entrada Aplicación')
         st.sidebar.markdown('________________')
-        st.experimental_set_query_params(**app_state)
+        st.query_params(**app_state)
         # st.experimental_set_query_params(**st.session_state.to_dict())
         functions[titles.index(title)]()
