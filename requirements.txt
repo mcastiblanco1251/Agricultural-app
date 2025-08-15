@@ -9,4 +9,4 @@ selenium
 bs4
 prophet
 plotly
-pydek
+
