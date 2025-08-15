@@ -1,4 +1,4 @@
-streamlit
+streamlit==1.29.0
 streamlit_option_menu
 pandas
 numpy
@@ -9,3 +9,4 @@ selenium
 bs4
 prophet
 plotly
+pydek
