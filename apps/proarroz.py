@@ -196,7 +196,7 @@ loc = pd.DataFrame(list(input_df.columns[16:42]), columns=['loc'])
 dfg = loc.join(map_data)
 st.write('Localizaión')
 st.pydeck_chart(pdk.Deck(
-    map_style="mapbox://styles/mapbox/streets-v12",
+    #map_style="mapbox://styles/mapbox/streets-v12",
     initial_view_state={"latitude": map_data.lat.mean(),
                         "longitude": map_data.lon.mean(), "zoom": 11, "pitch": 10},
     layers=[
