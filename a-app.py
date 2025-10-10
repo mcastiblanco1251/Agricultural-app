@@ -89,8 +89,8 @@ precio = st.Page(
 #pg = st.navigation(pages=[pro, precio])
 pg = st.navigation(
     {
-        "Secciones de la App": [pro],
-        "": [precio],
+        "Secciones de la App": [pro, precio],
+        
     }
 )
 
